@@ -1,4 +1,4 @@
-﻿﻿# 视频聊天快速接入
+# 视频聊天快速接入
 ------
 该业务旨在为开发者提供双人视频，乃至多人视频会议的服务
 
@@ -121,9 +121,9 @@ ILVCallManager.getInstance().addCallListener(new ILVCallListener() {
 ###设置渲染层
 > 渲染层级示例图 在界面层xml插入一个AVRootView,音视频数据最终是通过AVRootView渲染出来。AVRootView实际上不是一层View而是多层AVVideoView的叠加。
 > 用户可以自己通过bindIdAndView绑定用户到view
-![](../../raw/UiLayers.png)
+![](https://zhaoyang21cn.github.io/ilivesdk_help/readme_img/AVRootViewLayers.png)
 
-* 示例
+* 使用示例
 
 ```java
     <com.tencent.ilivesdk.view.AVRootView
