@@ -1,4 +1,4 @@
-package com.tencent.callsdkdemo;
+package com.tencent.calldemo;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -22,24 +22,22 @@ import com.tencent.callsdk.ILVCallConfig;
 import com.tencent.callsdk.ILVCallConstants;
 import com.tencent.callsdk.ILVCallListener;
 import com.tencent.callsdk.ILVCallManager;
-import com.tencent.callsdk.ILVCallNotification;
-import com.tencent.callsdk.ILVCallNotificationListener;
-import com.tencent.callsdk.ILVCallOption;
 import com.tencent.callsdk.ILVIncomingListener;
+import com.tencent.common.AccountMgr;
 import com.tencent.ilivesdk.ILiveCallBack;
-import com.tencent.ilivesdk.ILiveConstants;
-import com.tencent.ilivesdk.ILiveFunc;
 import com.tencent.ilivesdk.ILiveSDK;
 import com.tencent.ilivesdk.core.ILiveLoginManager;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * 联系人界面
  */
 public class ContactActivity extends Activity implements View.OnClickListener, ILVIncomingListener, ILVCallListener {
     private static String TAG = "ContactActivity";
-    private TextView tvMyAddr;
+    private TextView tvMyAddr, tvMsg;
     private EditText etDstAddr, idInput, pwdInput;
     private ListView lvCallList;
     private Button confrim, regist;
@@ -49,7 +47,7 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
     private AlertDialog mIncomingDlg;
     private int mCurIncomingId;
 
-    private boolean bTLSAccount = true;
+    private boolean bTLSAccount = false;
 
     // 多人视频控件列表
     private ArrayList<EditText> mEtNums = new ArrayList<>();
@@ -60,6 +58,7 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
 
     // 内部方法
     private void initView() {
+        tvMsg = (TextView)findViewById(R.id.tv_msg);
         tvMyAddr = (TextView) findViewById(R.id.tv_my_address);
         etDstAddr = (EditText) findViewById(R.id.et_dst_address);
         lvCallList = (ListView) findViewById(R.id.lv_call_list);
@@ -78,8 +77,13 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
         lvCallList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String remoteId = (String) adapterCallList.getItem(position);
-                makeCall(remoteId);
+                String strNums = (String) adapterCallList.getItem(position);
+                String [] numArrs = strNums.split(",");
+                ArrayList<String> nums = new ArrayList<String>();
+                for (int i=0; i<numArrs.length; i++){
+                    nums.add(numArrs[i]);
+                }
+                makeCall(ILVCallConstants.CALL_TYPE_VIDEO, nums);
             }
         });
 
@@ -93,6 +97,9 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
         }
     }
 
+    /**
+     * 注销后处理
+     */
     private void onLogout() {
         // 注销成功清除用户信息，并跳转到登陆界面
         //finish();
@@ -102,69 +109,19 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
     }
 
     /**
-     * 发起多人呼叫
-     * @param remoteId 远程主id
+     * 输出日志
      */
-    private boolean makeMutiCall(String remoteId){
-        ArrayList<String> nums = new ArrayList<>();
-        String tmpNum;
-        String calllist = "";
-        for (EditText etNum : mEtNums){
-            tmpNum = etNum.getText().toString();
-            if (!TextUtils.isEmpty(tmpNum)){
-                nums.add(tmpNum);
-                calllist = calllist + tmpNum + ",";
-            }
-        }
-        if (!nums.isEmpty()){
-            if (null != remoteId){
-                nums.add(remoteId);
-                calllist = calllist + remoteId + ",";
-            }
-
-            // 添加通话记录
-            addCallList(calllist);
-            // 多人在界面中发起呼叫
-            Intent intent = new Intent();
-            intent.setClass(this, MutiCallActivity.class);
-            intent.putExtra("HostId", ILiveLoginManager.getInstance().getMyUserId());
-            intent.putExtra("CallType", ILVCallConstants.CALL_TYPE_VIDEO);
-            intent.putStringArrayListExtra("CallNumbers", nums);
-            startActivity(intent);
-            return true;
-        }
-
-        return false;
+    private void addLogMessage(String strMsg){
+        String msg = tvMsg.getText().toString();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date curDate = new Date(System.currentTimeMillis());//获取当前时间
+        msg = msg + "\r\n["+formatter.format(curDate)+"] " + strMsg;
+        tvMsg.setText(msg);
     }
 
     /**
-     * 发起呼叫
-     *
-     * @param remoteId
+     * 注销
      */
-    private void makeCall(String remoteId) {
-        ILVCallOption option = new ILVCallOption(ILiveLoginManager.getInstance().getMyUserId())
-                .callTips("重要电话")
-                .setOnlineCall(true)
-                .degreeFix(true)
-            .setCallType(ILVCallConstants.CALL_TYPE_VIDEO);
-        option.setNotificationListener(new ILVCallNotificationListener() {
-            @Override
-            public void onRecvNotification(int callid, ILVCallNotification notification) {
-                Log.v(TAG, "onRecvNotification->callid: "+callid+", id:"+ Integer.toHexString(notification.getNotifId())+"/"+notification.getSender());
-            }
-        });
-        int callId = ILVCallManager.getInstance().makeCall(remoteId, option);
-        if (ILiveConstants.INVALID_INTETER_VALUE != callId) {
-            // 成功处理
-            Intent intent = new Intent();
-            intent.setClass(this, CallActivity.class);
-            intent.putExtra("HostId", ILiveLoginManager.getInstance().getMyUserId());
-            intent.putExtra("CallId", callId);
-            startActivity(intent);
-        }
-    }
-
     private void logout() {
         ILiveLoginManager.getInstance().iLiveLogout(new ILiveCallBack() {
             @Override
@@ -186,8 +143,7 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
         setContentView(R.layout.activity_simple_main);
         //TODO 初始化随心播
         if (bTLSAccount){
-            //ILiveSDK.getInstance().initSdk(getApplicationContext(), 1400013552, 6926);
-            ILiveSDK.getInstance().initSdk(getApplicationContext(), 1400001533, 792);
+            ILiveSDK.getInstance().initSdk(getApplicationContext(), 1400013700, 7285);
         }else {
             ILiveSDK.getInstance().initSdk(getApplicationContext(), 1400016949, 8002);
         }
@@ -201,6 +157,7 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
         // 设置通话回调
         ILVCallManager.getInstance().addIncomingListener(this);
         ILVCallManager.getInstance().addCallListener(this);
+        addLogMessage("Init CallSDK...");
     }
 
     @Override
@@ -228,21 +185,33 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
         ILVCallManager.getInstance().removeCallListener(this);
         super.onDestroy();
     }
-
     @Override
     public void onClick(View v) {
         if (R.id.btn_logout == v.getId()){
             logout();
         }else if (R.id.btn_make_call == v.getId()){
             String remoteId = etDstAddr.getText().toString();
-            if (makeMutiCall(remoteId)){
-                Log.d(TAG, "make MutiCall enter");
-            }else if (!TextUtils.isEmpty(remoteId)) {
-                addCallList(remoteId);
-                makeCall(remoteId);
-            } else {
+            if (TextUtils.isEmpty(remoteId)){
                 Toast.makeText(this, R.string.toast_phone_empty, Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            ArrayList<String> nums = new ArrayList<>();
+            String tmpNum;
+            String calllist = "";
+            nums.add(remoteId);
+            for (EditText etNum : mEtNums){
+                tmpNum = etNum.getText().toString();
+                if (!TextUtils.isEmpty(tmpNum)){
+                    nums.add(tmpNum);
+                    calllist = calllist + tmpNum + ",";
+                }
+            }
+            calllist = calllist + remoteId;
+
+            // 添加通话记录
+            addCallList(calllist);
+            makeCall(ILVCallConstants.CALL_TYPE_VIDEO, nums);
         }else if (R.id.regist == v.getId()){
             if (TextUtils.isEmpty(idInput.getText().toString()) || TextUtils.isEmpty(pwdInput.getText().toString())) {
                 return;
@@ -268,6 +237,7 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
             @Override
             public void onSuccess(Object data) {
                 bLogin = true;
+                addLogMessage("Login CallSDK success:"+id);
                 tvMyAddr.setText(ILiveLoginManager.getInstance().getMyUserId());
                 callView.setVisibility(View.VISIBLE);
             }
@@ -368,6 +338,28 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
     }
 
     /**
+     * 发起呼叫
+     */
+    private void makeCall(int callType, ArrayList<String> nums){
+        Intent intent = new Intent();
+        intent.setClass(this, CallActivity.class);
+        intent.putExtra("HostId", ILiveLoginManager.getInstance().getMyUserId());
+        intent.putExtra("CallId", 0);
+        intent.putExtra("CallType", callType);
+        intent.putStringArrayListExtra("CallNumbers", nums);
+        startActivity(intent);
+    }
+
+    private void acceptCall(int callId, String hostId, int callType){
+        Intent intent = new Intent();
+        intent.setClass(ContactActivity.this, CallActivity.class);
+        intent.putExtra("HostId", hostId);
+        intent.putExtra("CallId", mCurIncomingId);
+        intent.putExtra("CallType", callType);
+        startActivity(intent);
+    }
+
+    /**
      * 回调接口 来电
      * @param callId  来电ID
      * @param callType 来电类型
@@ -376,8 +368,8 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
      * @param strCustom 用户自定义字段
      */
     @Override
-
-    public void onNewIncomingCall(int callId, final int callType, final String fromUserId, String strTips, String strCustom, long timeStamp) {
+    public void onNewIncomingCall(final int callId, final int callType, final String fromUserId, String strTips, String strCustom, long timeStamp) {
+        addLogMessage("New Call from:"+fromUserId+"/"+callId);
         if (null != mIncomingDlg){  // 关闭遗留来电对话框
             mIncomingDlg.dismiss();
         }
@@ -388,19 +380,15 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
                 .setPositiveButton("Accept", new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (0 == ILVCallManager.getInstance().acceptCall(mCurIncomingId, new ILVCallOption(fromUserId).setCallType(callType))) {
-                            Intent intent = new Intent();
-                            intent.setClass(ContactActivity.this, CallActivity.class);
-                            intent.putExtra("HostId", fromUserId);
-                            intent.putExtra("CallId", mCurIncomingId);
-                            startActivity(intent);
-                        }
+                        acceptCall(callId, fromUserId, callType);
+                        addLogMessage("Accept Call :"+mCurIncomingId);
                     }
                 })
                 .setNegativeButton("Reject", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ILVCallManager.getInstance().rejectCall(mCurIncomingId);
+                        int ret = ILVCallManager.getInstance().rejectCall(mCurIncomingId);
+                        addLogMessage("Reject Call:"+ret+"/"+mCurIncomingId);
                     }
                 })
                 .create();
@@ -411,13 +399,9 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
 
     @Override
     public void onNewMutiIncomingCall(final int callId, final int callType, final String sponser, String strTips, String strCustom, long timeStamp) {
+        addLogMessage("New Muti Call from:"+sponser+"/"+callId);
         if (null != mIncomingDlg){  // 关闭遗留来电对话框
             mIncomingDlg.dismiss();
-        }
-        long curSec = ILiveFunc.getCurrentSec();
-        if (curSec < timeStamp || (curSec-timeStamp)>30){    //忽略超过30秒的消息
-            Log.v(TAG, "onNewMutiIncomingCall->ignore expired incoming:"+(curSec-timeStamp)+"s ago");
-            return;
         }
         mCurIncomingId = callId;
         mIncomingDlg = new AlertDialog.Builder(this)
@@ -426,17 +410,14 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
                 .setPositiveButton("Accept", new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent();
-                        intent.setClass(ContactActivity.this, MutiCallActivity.class);
-                        intent.putExtra("HostId", sponser);
-                        intent.putExtra("CallId", callId);
-                        intent.putExtra("CallType", callType);
-                        startActivity(intent);
+                        addLogMessage("Accept Muti Call:"+mCurIncomingId);
+                        acceptCall(callId, sponser, callType);
                     }
                 })
                 .setNegativeButton("Reject", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        addLogMessage("Reject Muti Call:"+mCurIncomingId);
                         ILVCallManager.getInstance().rejectCall(mCurIncomingId);
                     }
                 })
@@ -447,7 +428,7 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
 
     @Override
     public void onCallEstablish(int callId) {
-
+        addLogMessage("Call Establish :"+callId);
     }
 
     @Override
@@ -455,11 +436,12 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
         if (mCurIncomingId == callId){
             mIncomingDlg.dismiss();
         }
+        addLogMessage("End Call:"+endResult+"-"+endInfo+"/"+callId);
         Log.e("XDBG_END", "onCallEnd->id: "+callId+"|"+endResult+"|"+endInfo);
     }
 
     @Override
     public void onException(int iExceptionId, int errCode, String errMsg) {
-
+        addLogMessage("Exception id:"+iExceptionId+", "+errCode+"-"+errMsg);
     }
 }

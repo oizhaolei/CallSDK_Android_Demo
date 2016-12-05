@@ -1,14 +1,18 @@
-package com.tencent.callsdkdemo;
+package com.tencent.calldemo;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -16,28 +20,36 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tencent.av.sdk.AVAudioCtrl;
+import com.tencent.callsdk.ILVBCallMemberListener;
+import com.tencent.callsdk.ILVCallConstants;
 import com.tencent.callsdk.ILVCallListener;
 import com.tencent.callsdk.ILVCallManager;
+import com.tencent.callsdk.ILVCallOption;
 import com.tencent.ilivesdk.ILiveConstants;
 import com.tencent.ilivesdk.ILiveSDK;
-import com.tencent.ilivesdk.core.ILiveLog;
 import com.tencent.ilivesdk.core.ILiveLoginManager;
 import com.tencent.ilivesdk.view.AVRootView;
 import com.tencent.ilivesdk.view.AVVideoView;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 /**
  * 通话界面
  */
-public class CallActivity extends Activity implements ILVCallListener, View.OnClickListener {
+public class CallActivity extends Activity implements ILVCallListener, ILVBCallMemberListener, View.OnClickListener {
     private Button btnEndCall, btnCamera, btnMic, btnSpeaker;
     private AVRootView avRootView;
-    private TextView tvTitle;
+    private TextView tvTitle, tvLog;
     private RelativeLayout rlControl;
     private LinearLayout llBeauty;
     private SeekBar sbBeauty;
 
     private String mHostId;
     private int mCallId;
+    private int mCallType;
     private int mBeautyRate;
 
     private boolean bCameraEnable = true;
@@ -50,6 +62,8 @@ public class CallActivity extends Activity implements ILVCallListener, View.OnCl
         btnEndCall = (Button) findViewById(R.id.btn_end);
         btnSpeaker = (Button) findViewById(R.id.btn_speaker);
         tvTitle = (TextView) findViewById(R.id.tv_call_title);
+
+        tvLog = (TextView)findViewById(R.id.tv_log);
 
         btnCamera = (Button) findViewById(R.id.btn_camera);
         btnMic = (Button) findViewById(R.id.btn_mic);
@@ -124,6 +138,39 @@ public class CallActivity extends Activity implements ILVCallListener, View.OnCl
         rlControl.setVisibility(View.INVISIBLE);
     }
 
+    private void showInviteDlg(){
+        final EditText etInput = new EditText(this);
+        new AlertDialog.Builder(this).setTitle(R.string.invite_tip)
+                .setView(etInput)
+                .setPositiveButton(R.string.invite, new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (!TextUtils.isEmpty(etInput.getText().toString())) {
+                            List<String> nums = new ArrayList<String>();
+                            nums.add(etInput.getText().toString());
+                            ILVCallManager.getInstance().inviteUser(mCallId, nums);
+                        }
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                })
+                .show();
+    }
+
+    /**
+     * 输出日志
+     */
+    private void addLogMessage(String strMsg){
+        String msg = tvLog.getText().toString();
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+        Date curDate = new Date(System.currentTimeMillis());//获取当前时间
+        msg = msg + "\r\n["+formatter.format(curDate)+"] " + strMsg;
+        tvLog.setText(msg);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -134,14 +181,27 @@ public class CallActivity extends Activity implements ILVCallListener, View.OnCl
 
         Intent intent = getIntent();
         mHostId = intent.getStringExtra("HostId");
+        mCallType = intent.getIntExtra("CallType", ILVCallConstants.CALL_TYPE_VIDEO);
         mCallId = intent.getIntExtra("CallId", 0);
+        ILVCallOption option = new ILVCallOption(mHostId)
+                .callTips("CallSDK Demo")
+                .setMemberListener(this)
+                .setCallType(mCallType);
+        if (0 == mCallId) { // 发起呼叫
+            List<String> nums = intent.getStringArrayListExtra("CallNumbers");
+            if (nums.size() > 1){
+                mCallId = ILVCallManager.getInstance().makeMutiCall(nums, option);
+            }else{
+                mCallId = ILVCallManager.getInstance().makeCall(nums.get(0), option);
+            }
+        }else{  // 接听呼叫
+            ILVCallManager.getInstance().acceptCall(mCallId, option);
+        }
 
         initView();
 
         tvTitle.setText("New Call From:\n" + mHostId);
 
-        avRootView.getHolder().setFormat(PixelFormat.TRANSPARENT);
-        avRootView.bindIdAndView(1, ILiveLoginManager.getInstance().getMyUserId());
         avRootView.setAutoOrientation(false);
         ILVCallManager.getInstance().initAvView(avRootView);
     }
@@ -188,6 +248,14 @@ public class CallActivity extends Activity implements ILVCallListener, View.OnCl
         }else if(v.getId() == R.id.btn_beauty_setting_finish){
             llBeauty.setVisibility(View.GONE);
             rlControl.setVisibility(View.VISIBLE);
+        }else if(v.getId() == R.id.btn_invite){
+            showInviteDlg();
+        }else if(v.getId() == R.id.btn_log){
+            if (View.VISIBLE == tvLog.getVisibility()){
+                tvLog.setVisibility(View.INVISIBLE);
+            }else{
+                tvLog.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -200,25 +268,24 @@ public class CallActivity extends Activity implements ILVCallListener, View.OnCl
     public void onCallEstablish(int callId) {
         btnEndCall.setVisibility(View.VISIBLE);
 
-        ILiveLog.d("ILVB-DBG", "onCallEstablish->0:"+avRootView.getViewByIndex(0).getIdentifier()+"/"+avRootView.getViewByIndex(1).getIdentifier());
+        Log.d("ILVB-DBG", "onCallEstablish->0:"+avRootView.getViewByIndex(0).getIdentifier()+"/"+avRootView.getViewByIndex(1).getIdentifier());
         avRootView.swapVideoView(0, 1);
         // 设置点击小屏切换及可拖动
-        final AVVideoView minorView = avRootView.getViewByIndex(1);
-        minorView.setRecvFirstFrameListener(new AVVideoView.RecvFirstFrameListener() {
-            @Override
-            public void onFirstFrameRecved(int width, int height, int angle, String id) {
-                ILiveLog.d("ILVB-DBG", "onFirstFrameRecved->entered: "+width+", "+height+", "+angle+"/"+id);
+        for (int i=1; i<ILiveConstants.MAX_AV_VIDEO_NUM; i++){
+            final int index = i;
+            AVVideoView minorView = avRootView.getViewByIndex(i);
+            if (ILiveLoginManager.getInstance().getMyUserId().equals(minorView.getIdentifier())){
+                minorView.setMirror(true);      // 本地镜像
             }
-        });
-        minorView.setMirror(true);
-        minorView.setDragable(true);
-        minorView.setGestureListener(new GestureDetector.SimpleOnGestureListener(){
-            @Override
-            public boolean onSingleTapConfirmed(MotionEvent e) {
-                avRootView.swapVideoView(0, 1);
-                return false;
-            }
-        });
+            minorView.setDragable(true);    // 小屏可拖动
+            minorView.setGestureListener(new GestureDetector.SimpleOnGestureListener(){
+                @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    avRootView.swapVideoView(0, index);     // 与大屏交换
+                    return false;
+                }
+            });
+        }
     }
 
     /**
@@ -236,5 +303,15 @@ public class CallActivity extends Activity implements ILVCallListener, View.OnCl
     @Override
     public void onException(int iExceptionId, int errCode, String errMsg) {
 
+    }
+
+    @Override
+    public void onCameraEvent(String id, boolean bEnable) {
+        addLogMessage("["+id+"] "+(bEnable?"open":"close")+" camera");
+    }
+
+    @Override
+    public void onMicEvent(String id, boolean bEnable) {
+        addLogMessage("["+id+"] "+(bEnable?"open":"close")+" mic");
     }
 }

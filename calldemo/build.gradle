@@ -1,11 +1,10 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.2"
 
     defaultConfig {
-        applicationId "com.tencent.callsdkdemo"
         minSdkVersion 17
         targetSdkVersion 24
         versionCode 1
@@ -21,6 +20,6 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:24.2.0'
-    compile project(':calldemo')
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile project(':common')
 }

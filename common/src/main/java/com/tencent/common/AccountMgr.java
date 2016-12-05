@@ -1,4 +1,4 @@
-package com.tencent.callsdkdemo;
+package com.tencent.common;
 
 import android.os.Handler;
 import android.os.Looper;
