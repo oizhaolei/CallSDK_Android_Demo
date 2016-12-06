@@ -44,3 +44,6 @@ initAvView|ILVCallManager|设置渲染控件(AVVideoView)
 
 ## 快速接入
 请移步[视频聊天快速接入](./doc/helloworld.md)
+
+## API文档
+[API文档1.0.2](https://zhaoyang21cn.github.io/ilivesdk_help/callsdk/)
