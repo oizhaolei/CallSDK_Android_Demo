@@ -47,3 +47,9 @@ initAvView|ILVCallManager|设置渲染控件(AVVideoView)
 
 ## API文档
 [API文档1.0.2](https://zhaoyang21cn.github.io/ilivesdk_help/callsdk/)
+
+
+##联系我们
+[新需求](https://github.com/zhaoyang21cn/CallSDK_Android_Demo/issues/new)
+
+[BUG反馈](https://github.com/zhaoyang21cn/CallSDK_Android_Demo/issues/new)
