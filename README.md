@@ -13,6 +13,10 @@ CallSDK在Android Studio上开发。 导入只需要在gradle里增加一行（�
 compile 'com.tencent.callsdk:callsdk:1.0.2'
 ```
 
+## API文档
+[API文档1.0.2](https://zhaoyang21cn.github.io/ilivesdk_help/callsdk/)
+
+
 ## 功能概述
 
 CallSdk可以使用ILiveSDK的所有功能:
@@ -41,15 +45,12 @@ makeCall|ILVCallManager|发起视频(语音)呼叫
 acceptCall|ILVCallManager|接听视频(语音)通话
 rejectCall|ILVCallManager|拒接视频(语音通话)
 initAvView|ILVCallManager|设置渲染控件(AVVideoView)
+endCall|ILVCallManager|结束呼叫
 
 ## 快速接入
 请移步[视频聊天快速接入](./doc/helloworld.md)
 
-## API文档
-[API文档1.0.2](https://zhaoyang21cn.github.io/ilivesdk_help/callsdk/)
-
-
-##联系我们
+## 联系我们
 [新需求](https://github.com/zhaoyang21cn/CallSDK_Android_Demo/issues/new)
 
 [BUG反馈](https://github.com/zhaoyang21cn/CallSDK_Android_Demo/issues/new)
