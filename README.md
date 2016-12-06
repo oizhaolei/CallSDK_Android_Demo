@@ -50,6 +50,10 @@ endCall|ILVCallManager|结束呼叫
 ## 快速接入
 请移步[视频聊天快速接入](./doc/helloworld.md)
 
+
+## 日志分析
+[主线日志分析](./doc/mainlog.md)
+
 ## 联系我们
 [新需求](https://github.com/zhaoyang21cn/CallSDK_Android_Demo/issues/new)
 
