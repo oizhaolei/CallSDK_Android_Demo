@@ -27,7 +27,7 @@ CallSdk可以使用ILiveSDK的所有功能:
 >* 美颜/美白
 >* 视频推流/录制
 
-效果图:
+效果图(仅供参考):
 
 ![contact](https://zhaoyang21cn.github.io/ilivesdk_help/readme_img/contact.png)
 ![contact](https://zhaoyang21cn.github.io/ilivesdk_help/readme_img/call.png)
