@@ -50,6 +50,8 @@ endCall|ILVCallManager|结束呼叫
 ## 快速接入
 请移步[视频聊天快速接入](./doc/helloworld.md)
 
+## 错误码
+[CallSDK错误码](./doc/error.md)
 
 ## 日志分析
 [主线日志分析](./doc/mainlog.md)
