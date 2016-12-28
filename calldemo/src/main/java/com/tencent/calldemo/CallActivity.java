@@ -20,10 +20,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tencent.av.sdk.AVAudioCtrl;
+import com.tencent.av.sdk.AVView;
 import com.tencent.callsdk.ILVBCallMemberListener;
 import com.tencent.callsdk.ILVCallConstants;
 import com.tencent.callsdk.ILVCallListener;
 import com.tencent.callsdk.ILVCallManager;
+import com.tencent.callsdk.ILVCallNotification;
+import com.tencent.callsdk.ILVCallNotificationListener;
 import com.tencent.callsdk.ILVCallOption;
 import com.tencent.ilivesdk.ILiveConstants;
 import com.tencent.ilivesdk.ILiveSDK;
@@ -39,7 +42,7 @@ import java.util.List;
 /**
  * 通话界面
  */
-public class CallActivity extends Activity implements ILVCallListener, ILVBCallMemberListener, View.OnClickListener {
+public class CallActivity extends Activity implements ILVCallListener, ILVBCallMemberListener, View.OnClickListener, ILVCallNotificationListener {
     private Button btnEndCall, btnCamera, btnMic, btnSpeaker;
     private AVRootView avRootView;
     private TextView tvTitle, tvLog;
@@ -77,7 +80,7 @@ public class CallActivity extends Activity implements ILVCallListener, ILVBCallM
     private void changeCamera() {
         if (bCameraEnable) {
             ILVCallManager.getInstance().enableCamera(mCurCameraId, false);
-            avRootView.closeUserView(ILiveLoginManager.getInstance().getMyUserId(), true);
+            avRootView.closeUserView(ILiveLoginManager.getInstance().getMyUserId(), AVView.VIDEO_SRC_TYPE_CAMERA, true);
         } else {
             ILVCallManager.getInstance().enableCamera(mCurCameraId, true);
         }
@@ -185,6 +188,7 @@ public class CallActivity extends Activity implements ILVCallListener, ILVBCallM
         mCallId = intent.getIntExtra("CallId", 0);
         ILVCallOption option = new ILVCallOption(mHostId)
                 .callTips("CallSDK Demo")
+                .setNotificationListener(this)
                 .setMemberListener(this)
                 .setCallType(mCallType);
         if (0 == mCallId) { // 发起呼叫
@@ -194,16 +198,34 @@ public class CallActivity extends Activity implements ILVCallListener, ILVBCallM
             }else{
                 mCallId = ILVCallManager.getInstance().makeCall(nums.get(0), option);
             }
+            if (mCallId < ILiveConstants.NO_ERR){
+                Toast.makeText(getApplicationContext(), "Make Call Failed!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
         }else{  // 接听呼叫
             ILVCallManager.getInstance().acceptCall(mCallId, option);
         }
 
         initView();
 
+        ILiveLoginManager.getInstance().setUserStatusListener(new ILiveLoginManager.TILVBStatusListener() {
+            @Override
+            public void onForceOffline(int error, String message) {
+                finish();
+            }
+        });
+
         tvTitle.setText("New Call From:\n" + mHostId);
 
         avRootView.setAutoOrientation(false);
         ILVCallManager.getInstance().initAvView(avRootView);
+        avRootView.setSubCreatedListener(new AVRootView.onSubViewCreatedListener() {
+            @Override
+            public void onSubViewCreated(){
+                avRootView.getViewByIndex(0).setRotationMode(ILiveConstants.ROTATION_FULL_SCREEN);
+                //avRootView.bindIdAndView(0, AVView.VIDEO_SRC_TYPE_CAMERA, ILiveLoginManager.getInstance().getMyUserId());
+            }
+        });
     }
 
     @Override
@@ -313,5 +335,15 @@ public class CallActivity extends Activity implements ILVCallListener, ILVBCallM
     @Override
     public void onMicEvent(String id, boolean bEnable) {
         addLogMessage("["+id+"] "+(bEnable?"open":"close")+" mic");
+    }
+
+    @Override
+    public void onRecvNotification(int callid, ILVCallNotification notification) {
+        Log.v("ILVB-Not", "onRecvNotification->id, "+notification.toString());
+    }
+
+    @Override
+    public void onMemberEvent(String id, boolean bEnter) {
+        addLogMessage("["+id+"] "+(bEnter?"join":"exit")+" call");
     }
 }

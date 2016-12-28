@@ -22,6 +22,7 @@ import com.tencent.callsdk.ILVCallConfig;
 import com.tencent.callsdk.ILVCallConstants;
 import com.tencent.callsdk.ILVCallListener;
 import com.tencent.callsdk.ILVCallManager;
+import com.tencent.callsdk.ILVCallNotification;
 import com.tencent.callsdk.ILVIncomingListener;
 import com.tencent.common.AccountMgr;
 import com.tencent.ilivesdk.ILiveCallBack;
@@ -147,7 +148,7 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
         }else {
             ILiveSDK.getInstance().initSdk(getApplicationContext(), 1400016949, 8002);
         }
-        // 关闭IM群组
+
         ILVCallManager.getInstance().init(new ILVCallConfig()
             //.setTimeOut(300)
             .setAutoBusy(true));
@@ -363,24 +364,22 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
      * 回调接口 来电
      * @param callId  来电ID
      * @param callType 来电类型
-     * @param fromUserId
-     * @param strTips    提示消息
-     * @param strCustom 用户自定义字段
+     * @param notification  来电通知
      */
     @Override
-    public void onNewIncomingCall(final int callId, final int callType, final String fromUserId, String strTips, String strCustom, long timeStamp) {
-        addLogMessage("New Call from:"+fromUserId+"/"+callId);
+    public void onNewIncomingCall(final int callId, final int callType, final ILVCallNotification notification) {
+        addLogMessage("New Call from:"+notification.getSender()+"/"+callId+"-"+notification);
         if (null != mIncomingDlg){  // 关闭遗留来电对话框
             mIncomingDlg.dismiss();
         }
         mCurIncomingId = callId;
         mIncomingDlg = new AlertDialog.Builder(this)
-                .setTitle("New Call From "+fromUserId)
-                .setMessage(strTips)
+                .setTitle("New Call From "+notification.getSender())
+                .setMessage(notification.getNotifDesc())
                 .setPositiveButton("Accept", new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        acceptCall(callId, fromUserId, callType);
+                        acceptCall(callId, notification.getSender(), callType);
                         addLogMessage("Accept Call :"+mCurIncomingId);
                     }
                 })
@@ -394,36 +393,7 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
                 .create();
         mIncomingDlg.setCanceledOnTouchOutside(false);
         mIncomingDlg.show();
-        addCallList(fromUserId);
-    }
-
-    @Override
-    public void onNewMutiIncomingCall(final int callId, final int callType, final String sponser, String strTips, String strCustom, long timeStamp) {
-        addLogMessage("New Muti Call from:"+sponser+"/"+callId);
-        if (null != mIncomingDlg){  // 关闭遗留来电对话框
-            mIncomingDlg.dismiss();
-        }
-        mCurIncomingId = callId;
-        mIncomingDlg = new AlertDialog.Builder(this)
-                .setTitle("New Muti Call From "+sponser)
-                .setMessage(strTips)
-                .setPositiveButton("Accept", new DialogInterface.OnClickListener(){
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        addLogMessage("Accept Muti Call:"+mCurIncomingId);
-                        acceptCall(callId, sponser, callType);
-                    }
-                })
-                .setNegativeButton("Reject", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        addLogMessage("Reject Muti Call:"+mCurIncomingId);
-                        ILVCallManager.getInstance().rejectCall(mCurIncomingId);
-                    }
-                })
-                .create();
-        mIncomingDlg.setCanceledOnTouchOutside(false);
-        mIncomingDlg.show();
+        addCallList(notification.getSender());
     }
 
     @Override
