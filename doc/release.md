@@ -1,6 +1,6 @@
 ﻿##Release Note
 
-###V1.0.5 (2016-1-5)
+###V1.0.5 (2017-01-05)
  - 讨论组自动拉成员
  - 移动ILVCallNotification到config设置
 
