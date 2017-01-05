@@ -18,11 +18,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tencent.TIMManager;
 import com.tencent.callsdk.ILVCallConfig;
 import com.tencent.callsdk.ILVCallConstants;
 import com.tencent.callsdk.ILVCallListener;
 import com.tencent.callsdk.ILVCallManager;
 import com.tencent.callsdk.ILVCallNotification;
+import com.tencent.callsdk.ILVCallNotificationListener;
 import com.tencent.callsdk.ILVIncomingListener;
 import com.tencent.common.AccountMgr;
 import com.tencent.ilivesdk.ILiveCallBack;
@@ -36,7 +38,7 @@ import java.util.Date;
 /**
  * 联系人界面
  */
-public class ContactActivity extends Activity implements View.OnClickListener, ILVIncomingListener, ILVCallListener {
+public class ContactActivity extends Activity implements View.OnClickListener, ILVIncomingListener, ILVCallListener, ILVCallNotificationListener {
     private static String TAG = "ContactActivity";
     private TextView tvMyAddr, tvMsg;
     private EditText etDstAddr, idInput, pwdInput;
@@ -150,8 +152,8 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
         }
 
         ILVCallManager.getInstance().init(new ILVCallConfig()
-            //.setTimeOut(300)
-            .setAutoBusy(true));
+                .setNotificationListener(this)
+                .setAutoBusy(true));
 
         initView();
 
@@ -228,6 +230,11 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
         }else if (R.id.btn_add == v.getId()){
             addNewInputNumbers();
         }
+    }
+
+    @Override
+    public void onRecvNotification(int callid, ILVCallNotification notification) {
+        addLogMessage("onRecvNotification->notify id:"+notification.getNotifId()+"|"+notification.getUserInfo()+"/"+notification.getSender());
     }
 
     /**

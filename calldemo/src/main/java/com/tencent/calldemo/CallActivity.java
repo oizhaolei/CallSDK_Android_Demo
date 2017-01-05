@@ -42,7 +42,7 @@ import java.util.List;
 /**
  * 通话界面
  */
-public class CallActivity extends Activity implements ILVCallListener, ILVBCallMemberListener, View.OnClickListener, ILVCallNotificationListener {
+public class CallActivity extends Activity implements ILVCallListener, ILVBCallMemberListener, View.OnClickListener {
     private Button btnEndCall, btnCamera, btnMic, btnSpeaker;
     private AVRootView avRootView;
     private TextView tvTitle, tvLog;
@@ -188,7 +188,6 @@ public class CallActivity extends Activity implements ILVCallListener, ILVBCallM
         mCallId = intent.getIntExtra("CallId", 0);
         ILVCallOption option = new ILVCallOption(mHostId)
                 .callTips("CallSDK Demo")
-                .setNotificationListener(this)
                 .setMemberListener(this)
                 .setCallType(mCallType);
         if (0 == mCallId) { // 发起呼叫
@@ -335,11 +334,6 @@ public class CallActivity extends Activity implements ILVCallListener, ILVBCallM
     @Override
     public void onMicEvent(String id, boolean bEnable) {
         addLogMessage("["+id+"] "+(bEnable?"open":"close")+" mic");
-    }
-
-    @Override
-    public void onRecvNotification(int callid, ILVCallNotification notification) {
-        Log.v("ILVB-Not", "onRecvNotification->id, "+notification.toString());
     }
 
     @Override
