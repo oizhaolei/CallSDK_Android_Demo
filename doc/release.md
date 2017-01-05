@@ -1,8 +1,8 @@
 ﻿##Release Note
 
 ###V1.0.5 (2017-01-05)
- - 讨论组自动拉成员
- - 移动ILVCallNotification到config设置
+ - 讨论组自动拉呼叫(邀请)成员
+ - 移动setNotificationListener到config设置
 
 ###V1.0.4 (2016-12-28)
  - 扩展内部信令(兼容iOS多人)
