@@ -15,10 +15,12 @@ init|视频聊天业务初始化
 ILVCallConfig|初始化配置参数
 
 ```java
+ILiveSDK.getInstance().initSdk(getApplicationContext(), 
+            1400013700,                         // appid
+            7285);                              // accountType
 ILVCallManager.getInstance().init(new ILVCallConfig()
             .setTimeOut(30)         // 超时时间为30秒
             .setAutoBusy(true));    // 忙时自动拒接模式
-ILVCallManager.getInstance().addIncomingListener(this);
 ```
 
 ##设置来电回调
@@ -79,10 +81,9 @@ long|时间戳(1970年1月1日以来的秒数)
 
 ```java
 @Override
-public void onNewIncomingCall(int callId, final int callType, final String fromUserId, 
-                                          String strTips, String strCustom, long timeStamp){
-    if (0 == ILVCallManager.getInstance().acceptCall(mCurIncomingId, 
-                        new ILVCallOption(fromUserId).setCallType(callType))) {
+public void onNewIncomingCall(int callId, final int callType, int callType, ILVIncomingNotification notification){
+    if (0 == ILVCallManager.getInstance().acceptCall(callId, 
+                        new ILVCallOption(notification.getSponsorId()).setCallType(callType))) {
         // 接听成功
     }
 }
