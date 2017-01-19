@@ -218,13 +218,6 @@ public class CallActivity extends Activity implements ILVCallListener, ILVBCallM
 
         avRootView.setAutoOrientation(false);
         ILVCallManager.getInstance().initAvView(avRootView);
-        avRootView.setSubCreatedListener(new AVRootView.onSubViewCreatedListener() {
-            @Override
-            public void onSubViewCreated(){
-                avRootView.getViewByIndex(0).setRotationMode(ILiveConstants.ROTATION_FULL_SCREEN);
-                //avRootView.bindIdAndView(0, AVView.VIDEO_SRC_TYPE_CAMERA, ILiveLoginManager.getInstance().getMyUserId());
-            }
-        });
     }
 
     @Override

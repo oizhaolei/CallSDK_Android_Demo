@@ -26,6 +26,7 @@ import com.tencent.callsdk.ILVCallManager;
 import com.tencent.callsdk.ILVCallNotification;
 import com.tencent.callsdk.ILVCallNotificationListener;
 import com.tencent.callsdk.ILVIncomingListener;
+import com.tencent.callsdk.ILVIncomingNotification;
 import com.tencent.common.AccountMgr;
 import com.tencent.ilivesdk.ILiveCallBack;
 import com.tencent.ilivesdk.ILiveSDK;
@@ -374,7 +375,7 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
      * @param notification  来电通知
      */
     @Override
-    public void onNewIncomingCall(final int callId, final int callType, final ILVCallNotification notification) {
+    public void onNewIncomingCall(final int callId, final int callType, final ILVIncomingNotification notification) {
         addLogMessage("New Call from:"+notification.getSender()+"/"+callId+"-"+notification);
         if (null != mIncomingDlg){  // 关闭遗留来电对话框
             mIncomingDlg.dismiss();
@@ -386,7 +387,7 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
                 .setPositiveButton("Accept", new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        acceptCall(callId, notification.getSender(), callType);
+                        acceptCall(callId, notification.getSponsorId(), callType);
                         addLogMessage("Accept Call :"+mCurIncomingId);
                     }
                 })
