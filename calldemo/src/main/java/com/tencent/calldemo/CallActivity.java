@@ -197,10 +197,7 @@ public class CallActivity extends Activity implements ILVCallListener, ILVBCallM
             }else{
                 mCallId = ILVCallManager.getInstance().makeCall(nums.get(0), option);
             }
-            if (mCallId < ILiveConstants.NO_ERR){
-                Toast.makeText(getApplicationContext(), "Make Call Failed!", Toast.LENGTH_SHORT).show();
-                finish();
-            }
+
         }else{  // 接听呼叫
             ILVCallManager.getInstance().acceptCall(mCallId, option);
         }
