@@ -218,12 +218,14 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
             makeCall(ILVCallConstants.CALL_TYPE_VIDEO, nums);
         }else if (R.id.regist == v.getId()){
             if (TextUtils.isEmpty(idInput.getText().toString()) || TextUtils.isEmpty(pwdInput.getText().toString())) {
+                Toast.makeText(ContactActivity.this, "Regist failed: account or password is empty!", Toast.LENGTH_SHORT).show();
                 return;
             } else {
                 regist(idInput.getText().toString(), pwdInput.getText().toString());
             }
         }else if (R.id.confirm == v.getId()){
             if (TextUtils.isEmpty(idInput.getText().toString()) || TextUtils.isEmpty(pwdInput.getText().toString())) {
+                Toast.makeText(ContactActivity.this, "Login failed: account or password is empty!", Toast.LENGTH_SHORT).show();
                 return;
             } else {
                 login(idInput.getText().toString(), pwdInput.getText().toString());
