@@ -51,7 +51,7 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
     private AlertDialog mIncomingDlg;
     private int mCurIncomingId;
 
-    private boolean bTLSAccount = false;
+    private boolean bTLSAccount = true; // 默认为托管模式，与iOS一致
 
     // 多人视频控件列表
     private ArrayList<EditText> mEtNums = new ArrayList<>();
