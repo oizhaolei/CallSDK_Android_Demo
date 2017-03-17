@@ -1,4 +1,9 @@
 ﻿##Release Note
+###V1.0.13(2017-03-17)
+ - 修复notification通与iOS互通问题
+ - 添加进房间状态异常恢复机制
+ - 添加心跳可替换接听机制
+ 
 ###V1.0.12(2017-03-07)
  - 修复notification通知两次问题
  - 修复iOS多人呼叫一个Android用户,Android不会自动结束问题
