@@ -1,4 +1,5 @@
 ﻿##Release Note
+ 
 ###V1.0.13(2017-03-17)
  - 修复notification通与iOS互通问题
  - 添加进房间状态异常恢复机制
