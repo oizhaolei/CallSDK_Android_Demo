@@ -20,7 +20,7 @@ compile 'com.tencent.ilivesdk:ilivesdk:1.3.4'
 ps: 上面iLiveSDK的版本请使用[最新版本](https://github.com/zhaoyang21cn/ILiveSDK_Android_Demos)
 
 ## API文档
-[API文档1.0.10](https://zhaoyang21cn.github.io/ilivesdk_help/callsdk/)
+[API文档1.0.14](https://zhaoyang21cn.github.io/ilivesdk_help/callsdk/)
 
 
 ## 功能概述
