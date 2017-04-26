@@ -15,7 +15,7 @@ compile 'com.tencent.callsdk:callsdk:1.0.15'
 
 *导入iLiveSDK *
 
-compile 'com.tencent.ilivesdk:ilivesdk:1.3.4'
+compile 'com.tencent.ilivesdk:ilivesdk:1.4.0'
 
 ps: 上面iLiveSDK的版本请使用[最新版本](https://github.com/zhaoyang21cn/ILiveSDK_Android_Demos)
 
