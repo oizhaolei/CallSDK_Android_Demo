@@ -1,5 +1,12 @@
 ﻿## Release Note
  
+### V1.0.16(2017-05-03)
+ - ILVCallConfig添加服务器时间修正配置setServerTimeStamp(默认开启)
+ - ILVCallConfig添加修正成员状态配置setMemberStatusFix(默认开启)
+ - 添加扩展呼叫接口makeCall及makeMutiCall上抛进房间通知
+ - 优化修正成员状态配置下的未接听来电成员状态更新
+ - 修复修正成员状态配置下成员退出事件通知问题
+
 ### V1.0.15(2017-04-26)
  - ILVCallManager中添加主动占线接口responseLineBusy
  - 添加音视频事件可接听电话机制
