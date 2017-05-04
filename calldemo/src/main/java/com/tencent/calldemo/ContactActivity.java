@@ -147,7 +147,7 @@ public class ContactActivity extends Activity implements View.OnClickListener, I
         setContentView(R.layout.activity_simple_main);
         //TODO 初始化随心播
         if (bTLSAccount){
-            ILiveSDK.getInstance().initSdk(getApplicationContext(), 1400013700, 7285);
+            ILiveSDK.getInstance().initSdk(getApplicationContext(), 1400028285, 11818);
         }else {
             ILiveSDK.getInstance().initSdk(getApplicationContext(), 1400016949, 8002);
         }

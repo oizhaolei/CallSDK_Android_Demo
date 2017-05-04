@@ -178,6 +178,7 @@ public class CallActivity extends Activity implements ILVCallListener, ILVBCallM
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_simple_call);
+        initView();
 
         // 添加通话回调
         ILVCallManager.getInstance().addCallListener(this);
@@ -201,8 +202,6 @@ public class CallActivity extends Activity implements ILVCallListener, ILVBCallM
         }else{  // 接听呼叫
             ILVCallManager.getInstance().acceptCall(mCallId, option);
         }
-
-        initView();
 
         ILiveLoginManager.getInstance().setUserStatusListener(new ILiveLoginManager.TILVBStatusListener() {
             @Override
