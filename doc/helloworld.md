@@ -2,7 +2,7 @@
 ------
 该业务旨在为开发者提供双人视频，乃至多人视频会议的服务
 
-##初始化
+## 初始化
 在初始化时可以配置呼叫超时时间、忙时(通话过程中)自动拒接。
 为保证收到来电消息，需要配置来电回调
 
@@ -23,7 +23,7 @@ ILVCallManager.getInstance().init(new ILVCallConfig()
             .setAutoBusy(true));    // 忙时自动拒接模式
 ```
 
-##设置来电回调
+## 设置来电回调
 添加来电回调，登录成功后，有来电会通过回调通知上层
 
 接口名|接口描述
@@ -38,7 +38,7 @@ ILVIncomingListener|来电回调
 ILVCallManager.getInstance().addIncomingListener(this);
 ```
 
-##发起呼叫
+## 发起呼叫
 发起通话时，直接调用makeCall，填入对方的id即可发起呼叫
 可以通过setCallType设置通话类型(*纯语音呼叫也是可以的哦*)
 
@@ -62,7 +62,7 @@ if (ILiveConstants.INVALID_INTETER_VALUE != callId) {
 }
 ```
 
-##接听来电
+## 接听来电
 在收到来电时，会进入onNewIncomingCall或onNewMutiIncomingCall(多人)
 此时可以调用acceptCall或rejectCall进行接听或拒接
 
@@ -89,7 +89,7 @@ public void onNewIncomingCall(int callId, final int callType, int callType, ILVI
 }
 ```
 
-##通话回调
+## 通话回调
 对于通话可以设置回调来获取通话状态
 
 接口名|接口描述
@@ -119,7 +119,7 @@ ILVCallManager.getInstance().addCallListener(new ILVCallListener() {
 });
 ```
             
-###设置渲染层
+### 设置渲染层
 > 渲染层级示例图 在界面层xml插入一个AVRootView,音视频数据最终是通过AVRootView渲染出来。AVRootView实际上不是一层View而是多层AVVideoView的叠加。
 > 用户可以自己通过bindIdAndView绑定用户到view
 ![](https://zhaoyang21cn.github.io/ilivesdk_help/readme_img/AVRootViewLayers.png)
