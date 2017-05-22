@@ -1,5 +1,9 @@
 ﻿## Release Note
  
+### V1.0.17(2017-05-22)
+ - 优化成员状态上抛事件
+ - 修复呼叫讨论组未实时生效(接听者发群消息丢失问题)
+
 ### V1.0.16(2017-05-03)
  - ILVCallConfig添加服务器时间修正配置setServerTimeStamp(默认开启)
  - ILVCallConfig添加修正成员状态配置setMemberStatusFix(默认开启)
