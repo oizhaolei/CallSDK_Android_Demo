@@ -2,7 +2,7 @@
 
 CallSDK基于[ILiveSDK](https://github.com/zhaoyang21cn/ILiveSDK_Android_Demos)，实现双人视频(多人)业务功能封装，方便开发者快速搭建自己的视频聊天服务
 
-![](https://zhaoyang21cn.github.io/ilivesdk_help/readme_img/ilivesdk_construction.png)
+![](https://zhaoyang21cn.github.io/iLiveSDK_Help/readme_img/ilivesdk_construction.png)
 
 
 
@@ -35,8 +35,8 @@ CallSdk可以使用ILiveSDK的所有功能:
 
 效果图(仅供参考):
 
-![contact](https://zhaoyang21cn.github.io/ilivesdk_help/readme_img/contact.png)
-![contact](https://zhaoyang21cn.github.io/ilivesdk_help/readme_img/call.png)
+![contact](https://zhaoyang21cn.github.io/iLiveSDK_Help/readme_img/contact.png)
+![contact](https://zhaoyang21cn.github.io/iLiveSDK_Help/readme_img/call.png)
 
 ## 主要接口介绍
 
