@@ -19,7 +19,7 @@ public class AccountMgr {
     private final static String TAG = "AccountMgr";
 
     private final static String REGIST_PATH = "http://182.254.234.225:8085/regist";
-    private final static String LOGIN_PATH = "http://182.254.234.225:8085/login";
+    private final static String LOGIN_PATH = "http://xijing-admin.tttalk.org/download/login";
 
     public interface RequestCallBack{
         void onResult(int error, String response);
